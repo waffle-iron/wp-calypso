@@ -19,7 +19,7 @@ export default React.createClass( {
 		theme: React.PropTypes.object,
 		showPreview: React.PropTypes.bool,
 		onClose: React.PropTypes.func,
-		buttonLabel: React.PropTypes.string,
+		buttonLabel: React.PropTypes.node,
 		onButtonClick: React.PropTypes.func
 	},
 
