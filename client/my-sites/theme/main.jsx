@@ -267,12 +267,14 @@ const ThemeSheet = React.createClass( {
 	},
 
 	renderPreview() {
-		const buttonLabel = i18n.translate( 'Pick this design' );
+		const buttonText = i18n.translate( 'Pick this design' );
+		const priceElement = <span>{ buttonText }<span className="themes__sheet-action-bar-cost">{ this.props.price }</span></span>;
+		const buttonLabel = ( this.isActive() ? buttonText : priceElement );
 		return(
 			<ThemePreview showPreview={ this.state.showPreview }
 				theme={ this.props }
 				onClose={ this.togglePreview }
-				buttonLabel= { buttonLabel }
+				buttonLabel={ buttonLabel }
 				onButtonClick={ this.onPreviewButtonClick } />
 		);
 	},
