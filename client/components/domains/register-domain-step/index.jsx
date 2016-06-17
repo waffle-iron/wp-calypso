@@ -525,6 +525,14 @@ const RegisterDomainStep = React.createClass( {
 				productSlug: suggestion.product_slug
 			} ) );
 
+			if ( abtest( 'privacyCheckbox' ) === 'checkbox' && (
+				cartItems.isNextDomainFree( this.props.cart ) || cartItems.shouldBundleDomainWithPlan( domainsWithPlansOnlyTestEnabled, this.props.selectedSite, this.props.cart, suggestion )
+				) ) {
+				upgradesActions.addItem( cartItems.domainPrivacyProtection( {
+					domain: suggestion.domain_name
+				} ) );
+			}
+
 			if ( abtest( 'multiDomainRegistrationV1' ) === 'popupCart' ) {
 				upgradesActions.openCartPopup( { showKeepSearching: true } );
 			} else { // keep searching in gapps or singlePurchaseFlow

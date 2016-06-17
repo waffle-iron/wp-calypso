@@ -59,22 +59,27 @@ module.exports = React.createClass( {
 	},
 
 	render: function() {
-		var numberOfDomainRegistrations = this.getNumberOfDomainRegistrations(),
-			priceForPrivacyText,
+		const numberOfDomainRegistrations = this.getNumberOfDomainRegistrations(),
 			hasOneFreePrivacy = this.hasDomainPartOfPlan() && numberOfDomainRegistrations === 1;
+		let priceForPrivacyText,
+			privacyText,
+			freeWithPlan;
 
 		priceForPrivacyText = this.translate(
-			'Privacy protection keeps your information hidden when this domain is searched for in the public database for an extra %(cost)s / year.',
-			'Privacy protection keeps your information hidden when these domains are searched for in the public database for an extra %(cost)s per domain / year.',
+			'%(cost)s per year',
+			'%(cost)s per domain per year',
 			{
 				args: { cost: this.getPrivacyProtectionCost() },
 				count: numberOfDomainRegistrations
 			}
 		);
 
-		if ( hasOneFreePrivacy ) {
-			priceForPrivacyText = this.translate( 'Privacy protection keeps your information hidden when these domains are searched for in the public database. You can use it for no extra cost.' );
-		}
+		freeWithPlan = hasOneFreePrivacy &&
+			<span className="checkout__privacy-protection-free-text" ref="subMessage">
+				{ this.translate( 'Free with your plan' ) }
+			</span>;
+
+		privacyText = this.translate( "Privacy Protection hides your personal information in your domain's public records, to protect your identity and prevent spam." );
 
 		if ( abtest( 'privacyCheckbox' ) === 'checkbox' ) {
 			return (
@@ -83,7 +88,13 @@ module.exports = React.createClass( {
 						<input type="checkbox" onChange={ this.props.onCheckboxChange } checked={ this.props.isChecked } />
 						<div className="privacy-protection-checkbox__description">
 							<strong className="checkout__privacy-protection-checkbox-heading">{ this.translate( 'Please keep my information private.', { textOnly: true } ) }</strong>
-							<p className="checkout__privacy-protection-checkbox-text">{ priceForPrivacyText }</p>
+							<p className={ 'checkout__privacy-protection-price-text' }>
+								<span className={ ( hasOneFreePrivacy && 'free-with-plan' ) }>
+									{ priceForPrivacyText }
+								</span>
+								{ freeWithPlan }
+							</p>
+							<p className="checkout__privacy-protection-checkbox-text">{ privacyText }</p>
 							<a href="" onClick={ this.handleDialogOpen }>Learn more about Privacy Protection.</a>
 						</div>
 						<div>
