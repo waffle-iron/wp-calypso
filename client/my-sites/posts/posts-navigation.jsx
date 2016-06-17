@@ -221,6 +221,7 @@ export default React.createClass( {
 					key={ 'authorSegmented' + path }
 					path={ path }
 					selected={ path === this.props.context.pathname }
+					title={ textItem }
 				>
 					{ textItem }
 					{ isMe && <Gravatar size={ 16 } user={ user.get() } /> }
