@@ -14,6 +14,10 @@ var React = require( 'react' ),
 	i18n = require( 'i18n-calypso' ),
 	isEmpty = require( 'lodash/isEmpty' );
 
+if ( process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'stage' || process.env.NODE_ENV === 'wpcalypso' ) {
+	require( 'lib/degrade-es6-fns' )
+}
+
 /**
  * Internal dependencies
  */
