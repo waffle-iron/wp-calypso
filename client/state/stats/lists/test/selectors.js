@@ -19,6 +19,7 @@ describe( 'selectors', () => {
 	beforeEach( () => {
 		getSiteStatsPostStreakData.memoizedSelector.cache.clear();
 		getSiteStatsMaxPostsByDay.memoizedSelector.cache.clear();
+		getSiteStatsParsedData.memoizedSelector.cache.clear();
 	} );
 
 	describe( 'getSiteStatsParsedData()', () => {
