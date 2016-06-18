@@ -9,9 +9,7 @@ import i18n from 'i18n-calypso';
  * Internal dependencies
  */
 import createSelector from 'lib/create-selector';
-import {
-	getSerializedStatsQuery
-} from './utils';
+import * as utils from './utils';
 
 /**
  * Returns true if currently requesting stats for the statType and query combo, or false
@@ -24,7 +22,7 @@ import {
  * @return {Boolean}          Whether stats are being requested
  */
 export function isRequestingSiteStatsForQuery( state, siteId, statType, query ) {
-	const serializedQuery = getSerializedStatsQuery( query );
+	const serializedQuery = utils.getSerializedStatsQuery( query );
 	return !! get( state.stats.lists.requesting, [ siteId, statType, serializedQuery ] );
 }
 
@@ -39,7 +37,7 @@ export function isRequestingSiteStatsForQuery( state, siteId, statType, query ) 
  * @return {?Object}           Data for the query
  */
 export function getSiteStatsForQuery( state, siteId, statType, query ) {
-	const serializedQuery = getSerializedStatsQuery( query );
+	const serializedQuery = utils.getSerializedStatsQuery( query );
 	return get( state.stats.lists.items, [ siteId, statType, serializedQuery ], null );
 }
 
@@ -73,7 +71,7 @@ export const getSiteStatsPostStreakData = createSelector(
 	},
 	( state, siteId, query ) => getSiteStatsForQuery( state, siteId, 'statsStreak', query ),
 	( state, siteId, query ) => {
-		const serializedQuery = getSerializedStatsQuery( query );
+		const serializedQuery = utils.getSerializedStatsQuery( query );
 		return [ siteId, 'statsStreak', serializedQuery ].join();
 	}
 );
@@ -100,7 +98,7 @@ export const getSiteStatsMaxPostsByDay = createSelector(
 	},
 	( state, siteId, query ) => getSiteStatsForQuery( state, siteId, 'statsStreak', query ),
 	( state, siteId, query ) => {
-		const serializedQuery = getSerializedStatsQuery( query );
+		const serializedQuery = utils.getSerializedStatsQuery( query );
 		return [ siteId, 'statsStreakMax', serializedQuery ].join();
 	}
 );
@@ -119,3 +117,28 @@ export function getSiteStatsPostsCountByDay( state, siteId, query, date ) {
 	return data[ date ] || null;
 }
 
+/**
+ * Returns a parsed object of statsPublicize data for a given query, or default "empty" object
+ * if no statsStreak data has been received for that site.
+ *
+ * @param  {Object}  state    Global state tree
+ * @param  {Number}  siteId   Site ID
+ * @param  {Object}  query    Stats query object
+ * @return {Array}            Parsed Data for the query
+ */
+export const getSiteStatsParsedData = createSelector(
+	( state, siteId, statType, query ) => {
+		const data = getSiteStatsForQuery( state, siteId, statType, query );
+
+		if ( 'function' === typeof utils[ statType ] ) {
+			return utils[ statType ].call( this, data );
+		}
+
+		return data;
+	},
+	( state, siteId, statType, query ) => getSiteStatsForQuery( state, siteId, statType, query ),
+	( state, siteId, statType, query ) => {
+		const serializedQuery = utils.getSerializedStatsQuery( query );
+		return [ siteId, statType, serializedQuery ].join();
+	}
+);

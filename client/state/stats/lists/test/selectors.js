@@ -8,8 +8,9 @@ import { expect } from 'chai';
  */
 import {
 	getSiteStatsMaxPostsByDay,
-	getSiteStatsPostStreakData,
 	getSiteStatsForQuery,
+	getSiteStatsParsedData,
+	getSiteStatsPostStreakData,
 	getSiteStatsPostsCountByDay,
 	isRequestingSiteStatsForQuery
 } from '../selectors';
@@ -18,6 +19,76 @@ describe( 'selectors', () => {
 	beforeEach( () => {
 		getSiteStatsPostStreakData.memoizedSelector.cache.clear();
 		getSiteStatsMaxPostsByDay.memoizedSelector.cache.clear();
+	} );
+
+	describe( 'getSiteStatsParsedData()', () => {
+		it( 'should return empty array if no data exists', () => {
+			const data = getSiteStatsParsedData( {
+				stats: {
+					lists: {
+						items: {}
+					}
+				}
+			}, 2916284, 'statsPublicize', {} );
+
+			expect( data ).to.eql( [] );
+		} );
+
+		it( 'should return the exact state data if no parser exists', () => {
+			const data = getSiteStatsParsedData( {
+				stats: {
+					lists: {
+						items: {
+							2916284: {
+								statsPublicizeNotReallyALegitName: {
+									'[]': {
+										fake: 'data'
+									}
+								}
+							}
+						}
+					}
+				}
+			}, 2916284, 'statsPublicizeNotReallyALegitName', {} );
+
+			expect( data ).to.eql( { fake: 'data' } );
+		} );
+
+		it( 'should utilize parser utility if it exists', () => {
+			const data = getSiteStatsParsedData( {
+				stats: {
+					lists: {
+						items: {
+							2916284: {
+								statsPublicize: {
+									'[]': {
+										services: [ {
+											service: 'twitter',
+											followers: 528
+										}, {
+											service: 'facebook',
+											followers: 282
+										} ]
+									}
+								}
+							}
+						}
+					}
+				}
+			}, 2916284, 'statsPublicize', {} );
+
+			expect( data ).to.eql( [
+				{
+					label: 'Twitter',
+					icon: 'https://secure.gravatar.com/blavatar/7905d1c4e12c54933a44d19fcd5f9356?s=48',
+					value: 528
+				}, {
+					label: 'Facebook',
+					icon: 'https://secure.gravatar.com/blavatar/2343ec78a04c6ea9d80806345d31fd78?s=48',
+					value: 282
+				}
+			] );
+		} );
 	} );
 
 	describe( 'isRequestingSiteStatsForQuery()', () => {

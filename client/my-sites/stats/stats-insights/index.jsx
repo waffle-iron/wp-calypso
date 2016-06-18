@@ -15,6 +15,7 @@ import Followers from '../stats-followers';
 import PostingActivity from '../post-trends';
 import TodaysStats from '../stats-site-overview';
 import StatsModule from '../stats-module';
+import StatsConnectedModule from '../stats-module/connected-list';
 import statsStrings from '../stats-strings';
 import MostPopular from 'my-sites/stats/most-popular';
 import LatestPostSummary from '../post-performance';
@@ -30,7 +31,6 @@ export default React.createClass( {
 		emailFollowersList: PropTypes.object.isRequired,
 		followList: PropTypes.object.isRequired,
 		insightsList: PropTypes.object.isRequired,
-		publicizeList: PropTypes.object.isRequired,
 		site: React.PropTypes.oneOfType( [
 			React.PropTypes.bool,
 			React.PropTypes.object
@@ -47,7 +47,6 @@ export default React.createClass( {
 			emailFollowersList,
 			followList,
 			insightsList,
-			publicizeList,
 			site,
 			wpcomFollowersList } = this.props;
 
@@ -107,11 +106,10 @@ export default React.createClass( {
 									wpcomFollowersList={ wpcomFollowersList }
 									emailFollowersList={ emailFollowersList }
 									followList={ followList } />
-								<StatsModule
-									path={ 'publicize' }
+								<StatsConnectedModule
+									path="publicize"
 									moduleStrings={ moduleStrings.publicize }
-									site={ site }
-									dataList={ publicizeList } />
+									statType="statsPublicize" />
 							</div>
 						</div>
 					</div>
