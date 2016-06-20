@@ -15,9 +15,10 @@ import ThemePreview from './theme-preview';
 import SidebarNavigation from 'my-sites/sidebar-navigation';
 import ThemesSiteSelectorModal from './themes-site-selector-modal';
 import ThemesSelection from './themes-selection';
-import { getDetailsUrl, getSupportUrl, isPremium, addTracking } from './helpers';
+import { isPremium, addTracking } from './helpers';
 import actionLabels from './action-labels';
 import { getQueryParams, getThemesList } from 'state/themes/themes-list/selectors';
+import { getThemeDetailsUrl, getThemeSupportUrl } from 'state/themes/themes/selectors';
 import PageViewTracker from 'lib/analytics/page-view-tracker';
 import config from 'config';
 
@@ -70,10 +71,10 @@ const ThemesMultiSite = React.createClass( {
 				separator: true
 			},
 			details: {
-				getUrl: theme => getDetailsUrl( theme ),
+				getUrl: this.props.getDetailsUrl,
 			},
 			support: {
-				getUrl: theme => getSupportUrl( theme ),
+				getUrl: this.props.getSupportUrl,
 				// Free themes don't have support docs.
 				hideForTheme: theme => ! isPremium( theme )
 			},
@@ -138,7 +139,9 @@ const ThemesMultiSite = React.createClass( {
 export default connect(
 	state => ( {
 		queryParams: getQueryParams( state ),
-		themesList: getThemesList( state )
+		themesList: getThemesList( state ),
+		getDetailsUrl: getThemeDetailsUrl.bind( null, state ),
+		getSupportUrl: getThemeSupportUrl.bind( null, state )
 	} ),
 	{
 		activate,
