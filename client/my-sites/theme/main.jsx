@@ -30,6 +30,8 @@ import { getSiteSlug } from 'state/sites/selectors';
 import { isPremium, getForumUrl } from 'my-sites/themes/helpers';
 import ActivatingTheme from 'components/data/activating-theme';
 import ThanksModal from 'my-sites/themes/thanks-modal';
+import QueryCurrentTheme from 'components/data/query-current-theme';
+import { getCurrentTheme } from 'state/themes/current-theme/selectors';
 import ThemesSiteSelectorModal from 'my-sites/themes/themes-site-selector-modal';
 import actionLabels from 'my-sites/themes/action-labels';
 import { getBackPath } from 'state/themes/themes-ui/selectors';
@@ -58,6 +60,7 @@ const ThemeSheet = React.createClass( {
 		// Connected props
 		selectedSite: React.PropTypes.object,
 		siteSlug: React.PropTypes.string,
+		currentTheme: React.PropTypes.object,
 		backPath: React.PropTypes.string,
 	},
 
@@ -79,10 +82,15 @@ const ThemeSheet = React.createClass( {
 		this.setState( { selectedAction: null } );
 	},
 
+	isActive() {
+		const { id, currentTheme } = this.props;
+		return currentTheme && currentTheme.id === id;
+	},
+
 	onPrimaryClick() {
 		if ( ! this.props.isLoggedIn ) {
 			this.props.signup( this.props );
-		} else if ( this.props.active ) {
+		} else if ( this.isActive() ) {
 			this.props.customize( this.props, this.props.selectedSite );
 		} else if ( isPremium( this.props ) && ! this.props.purchased ) {
 			this.selectSiteAndDispatch( 'purchase' );
@@ -296,7 +304,7 @@ const ThemeSheet = React.createClass( {
 
 	renderSheet() {
 		let actionTitle = <span className="themes__sheet-button-placeholder">loading......</span>;
-		if ( this.props.active ) {
+		if ( this.isActive() ) {
 			actionTitle = i18n.translate( 'Customize' );
 		} else if ( this.props.name ) {
 			actionTitle = i18n.translate( 'Pick this design' );
@@ -313,6 +321,7 @@ const ThemeSheet = React.createClass( {
 			<Main className="themes__sheet">
 			<PageViewTracker path={ analyticsPath } title={ analyticsPageTitle }/>
 				{ this.renderBar() }
+				{ siteID && <QueryCurrentTheme siteId={ siteID }/> }
 				<ActivatingTheme siteId={ siteID }>
 					<ThanksModal
 						site={ this.props.selectedSite }
@@ -334,7 +343,7 @@ const ThemeSheet = React.createClass( {
 							backText={ i18n.translate( 'All Themes' ) }>
 					<Button className="themes__sheet-primary-button" onClick={ this.onPrimaryClick }>
 						{ actionTitle }
-						{ ! this.props.active && priceElement }
+						{ ! this.isActive() && priceElement }
 					</Button>
 				</HeaderCake>
 				<div className="themes__sheet-columns">
@@ -365,8 +374,9 @@ export default connect(
 	( state ) => {
 		const selectedSite = getSelectedSite( state );
 		const siteSlug = selectedSite ? getSiteSlug( state, selectedSite.ID ) : '';
+		const currentTheme = getCurrentTheme( state, selectedSite && selectedSite.ID );
 		const backPath = getBackPath( state );
-		return { selectedSite, siteSlug, backPath };
+		return { selectedSite, siteSlug, currentTheme, backPath };
 	},
 	{ signup, purchase, activate, clearActivated, customize }
 )( ThemeSheet );
