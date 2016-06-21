@@ -48,6 +48,7 @@
 	&.is-placeholder {
 		pointer-events: none;
 		user-select: none;
+		margin-right: 14px !important;
 
 		.reader-start-card__site-title,
 		.reader-start-post-preview__title,
@@ -78,10 +79,9 @@
 		}
 
 		.site-icon {
-			display: inline-block;
-			margin-right: 6px;
-			height: 16px;
-			width: 16px;
+			float: left;
+			margin-right: 4px;
+			margin-top: 2px;
 		}
 	}
 
