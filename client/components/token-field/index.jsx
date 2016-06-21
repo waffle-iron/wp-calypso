@@ -155,7 +155,6 @@ var TokenField = React.createClass( {
 	_renderToken: function( token ) {
 		const value = this._getTokenValue( token );
 		const status = token.status ? token.status : undefined;
-		console.log( token );
 
 		return (
 			<Token
