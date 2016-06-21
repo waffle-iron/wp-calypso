@@ -70,7 +70,7 @@ const actionLog = combineReducers( {
 	temporary,
 } );
 
-export default function( state, action ) {
+export default function( state = {}, action ) {
 	if ( includes( [ SERIALIZE, DESERIALIZE ], action.type ) ) {
 		return {
 			permanent: state.permanent,
