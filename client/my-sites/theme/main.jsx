@@ -53,11 +53,11 @@ const ThemeSheet = React.createClass( {
 		taxonomies: React.PropTypes.object,
 		stylesheet: React.PropTypes.string,
 		active: React.PropTypes.bool,
+		purchased: React.PropTypes.bool,
 		isLoggedIn: React.PropTypes.bool,
 		// Connected props
 		selectedSite: React.PropTypes.object,
 		siteSlug: React.PropTypes.string,
-		currentTheme: React.PropTypes.object,
 		backPath: React.PropTypes.string,
 	},
 
@@ -84,8 +84,7 @@ const ThemeSheet = React.createClass( {
 			this.props.signup( this.props );
 		} else if ( this.props.active ) {
 			this.props.customize( this.props, this.props.selectedSite );
-		} else if ( isPremium( this.props ) ) {
-			// TODO: check theme is not already purchased
+		} else if ( isPremium( this.props ) && ! this.props.purchased ) {
 			this.selectSiteAndDispatch( 'purchase' );
 		} else {
 			this.selectSiteAndDispatch( 'activate' );

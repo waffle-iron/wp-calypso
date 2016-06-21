@@ -135,6 +135,7 @@ export function receiveThemeDetails( theme ) {
 		themeStylesheet: theme.stylesheet,
 		themeDemoUri: theme.demo_uri,
 		themeActive: theme.active,
+		themePurchased: theme.purchased,
 	};
 }
 
