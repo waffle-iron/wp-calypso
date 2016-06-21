@@ -6,9 +6,9 @@ import React from 'react';
 /**
  * Internal dependencies
  */
-const PremiumPopover = require( 'components/plans/premium-popover' ),
-	abtest = require( 'lib/abtest' ).abtest,
-	domainsWithPlansOnlyTestEnabled = abtest( 'domainsWithPlansOnly' ) === 'plansOnly';
+import PremiumPopover from 'components/plans/premium-popover';
+import { abtest } from 'lib/abtest';
+import classnames from 'classnames';
 
 const DomainProductPrice = React.createClass( {
 	propTypes: {
@@ -18,21 +18,25 @@ const DomainProductPrice = React.createClass( {
 		requiresPlan: React.PropTypes.bool
 	},
 	renderFreeWithPlan() {
-		const product_price = ! domainsWithPlansOnlyTestEnabled &&
-							<span
-								lassName="domain-product-price__price">{ this.translate( '%(cost)s {{small}}/year{{/small}}', {
-									args: { cost: this.props.price },
-									components: { small: <small /> }
-								} ) }</span>;
+		const domainsWithPlansOnlyTestEnabled = abtest( 'domainsWithPlansOnly' ) === 'plansOnly';
 
 		return (
 			<div
-				className={ 'domain-product-price is-free-domain' + ( domainsWithPlansOnlyTestEnabled && ' no-price' ) }>
-				{ product_price }
+				className={ classnames( 'domain-product-price', 'is-free-domain', { 'no-price': domainsWithPlansOnlyTestEnabled } ) }>
+				{ ! domainsWithPlansOnlyTestEnabled && this.renderFreeWithPlanPrice() }
 				<span className="domain-product-price__free-text" ref="subMessage">
 					{ this.translate( 'Free with your plan' ) }
 				</span>
 			</div>
+		);
+	},
+	renderFreeWithPlanPrice() {
+		return (
+			<span
+				className="domain-product-price__price">{ this.translate( '%(cost)s {{small}}/year{{/small}}', {
+					args: { cost: this.props.price },
+					components: { small: <small /> }
+				} ) }</span>
 		);
 	},
 	renderFree() {
