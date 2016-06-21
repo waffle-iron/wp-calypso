@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-var React = require( 'react' );
+const React = require( 'react' );
 
 /**
  * Internal dependencies
  */
-var cartItems = require( 'lib/cart-values' ).cartItems,
+const cartItems = require( 'lib/cart-values' ).cartItems,
 	PrivacyProtectionDialog = require( './privacy-protection-dialog' ),
 	Card = require( 'components/card' ),
 	Gridicon = require( 'components/gridicon' ),
@@ -38,13 +38,13 @@ module.exports = React.createClass( {
 	},
 
 	getFirstDomainToRegister: function() {
-		var domainRegistration = this.getDomainRegistrations().shift();
+		const domainRegistration = this.getDomainRegistrations().shift();
 
 		return domainRegistration.meta;
 	},
 
 	hasDomainPartOfPlan: function() {
-		var cart = this.props.cart;
+		const cart = this.props.cart;
 		return cart.has_bundle_credit || cartItems.hasPlan( cart );
 	},
 
@@ -53,35 +53,30 @@ module.exports = React.createClass( {
 	},
 
 	getPrivacyProtectionCost: function() {
-		var products = this.props.productsList.get();
+		const products = this.props.productsList.get();
 
 		return products.private_whois.cost_display;
 	},
 
 	render: function() {
 		const numberOfDomainRegistrations = this.getNumberOfDomainRegistrations(),
-			hasOneFreePrivacy = this.hasDomainPartOfPlan() && numberOfDomainRegistrations === 1;
-		let priceForPrivacyText,
-			privacyText,
-			freeWithPlan;
-
-		priceForPrivacyText = this.translate(
-			'%(cost)s per year',
-			'%(cost)s per domain per year',
-			{
-				args: { cost: this.getPrivacyProtectionCost() },
-				count: numberOfDomainRegistrations
-			}
-		);
-
-		freeWithPlan = hasOneFreePrivacy &&
-			<span className="checkout__privacy-protection-free-text" ref="subMessage">
-				{ this.translate( 'Free with your plan' ) }
-			</span>;
-
-		privacyText = this.translate( "Privacy Protection hides your personal information in your domain's public records, to protect your identity and prevent spam." );
+			hasOneFreePrivacy = this.hasDomainPartOfPlan() && numberOfDomainRegistrations === 1,
+			priceForPrivacyText = this.translate(
+				'%(cost)s per year',
+				'%(cost)s per domain per year',
+				{
+					args: { cost: this.getPrivacyProtectionCost() },
+					count: numberOfDomainRegistrations
+				}
+			);
 
 		if ( abtest( 'privacyCheckbox' ) === 'checkbox' ) {
+			const privacyText = this.translate( "Privacy Protection hides your personal information in your domain's public records, to protect your identity and prevent spam." ),
+				freeWithPlan = hasOneFreePrivacy &&
+							<span className="checkout__privacy-protection-free-text">
+								{ this.translate( 'Free with your plan' ) }
+							</span>;
+
 			return (
 				<div>
 					<Card className="checkout__privacy-protection-checkbox">
