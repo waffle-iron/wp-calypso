@@ -376,5 +376,5 @@ const Signup = React.createClass( {
 export default connect(
 	state => ( { domainsWithPlansOnly: getCurrentUser( state ) ? currentUserHasFlag( state, DWPO ) : true } ),
 	() => ( {} ),
-	void 0,
+	undefined,
 	{ pure: false } )( Signup );
