@@ -1,8 +1,13 @@
 /**
+ * External dependencies
+ */
+import get from 'lodash/get';
+
+/**
  * Internal dependencies
  */
 import { getUser } from 'state/users/selectors';
-import get from 'lodash/get';
+import createSelector from 'lib/create-selector';
 
 /**
  * Returns the user object for the current user.
@@ -49,3 +54,31 @@ export function getCurrentUserLocale( state ) {
 export function canCurrentUser( state, siteId, capability ) {
 	return get( state.currentUser.capabilities, [ siteId, capability ], null );
 }
+
+/**
+ * Returns a log of actions from certain types that have previously been
+ * dispatched for the current user. This includes actions from a permanent
+ * queue that persists in localStorage, as well as actions from a temporary
+ * queue that only lasts for the duration of the current Calypso session.
+ *
+ * These actions are to be consumed by and inform Calypso's Guided Tours
+ * framework.
+ *
+ * Since this selector is pulls from two sources and merges them, it will
+ * always return a different object instance even when called with the same
+ * `state`. Thus, we need to memoize it with `createSelector` — not for its own
+ * benefit, but for that of other selectors which depend on it.
+ *
+ * @param  {Object}   state      Global state tree
+ * @return {Array}               Array of Redux actions, each with timestamp
+ */
+export const getActionLog = createSelector(
+	state => [
+		...get( state, 'currentUser.actionLog.permanent', [] ),
+		...get( state, 'currentUser.actionLog.temporary', [] ),
+	],
+	state => [
+		state.currentUser.actionLog.permanent,
+		state.currentUser.actionLog.temporary,
+	]
+);

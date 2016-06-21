@@ -9,8 +9,13 @@ import { expect } from 'chai';
 import {
 	getCurrentUser,
 	getCurrentUserLocale,
-	canCurrentUser
+	canCurrentUser,
+	getActionLog,
 } from '../selectors';
+import {
+	GUIDED_TOUR_UPDATE,
+	SET_ROUTE,
+} from 'state/action-types';
 
 describe( 'selectors', () => {
 	describe( '#getCurrentUser()', () => {
@@ -119,6 +124,66 @@ describe( 'selectors', () => {
 			}, 2916284, 'manage_foo' );
 
 			expect( isCapable ).to.be.null;
+		} );
+	} );
+
+	describe( 'actionLog', () => {
+		it( 'should initially return one empty list', () => {
+			const log = getActionLog( {
+				currentUser: {
+					actionLog: {
+						permanent: [],
+						temporary: [],
+					}
+				}
+			} );
+
+			expect( log ).to.eql( [] );
+		} );
+
+		it( 'should merge from both queues', () => {
+			const permanent = [
+				{
+					type: GUIDED_TOUR_UPDATE,
+					shouldShow: false,
+				},
+			];
+			const temporary = [
+				{
+					type: SET_ROUTE,
+					path: '/menus/77203074',
+				}
+			];
+			const log = getActionLog( {
+				currentUser: {
+					actionLog: {
+						permanent,
+						temporary,
+					}
+				}
+			} );
+
+			expect( log ).to.eql( [ ...permanent, ...temporary ] );
+		} );
+
+		it( 'should preserve object references whenever possible', () => {
+			const state = {
+				currentUser: {
+					actionLog: {
+						permanent: [],
+						temporary: [
+							{
+								type: SET_ROUTE,
+								path: '/menus/77203074',
+							}
+						],
+					}
+				}
+			};
+			const log1 = getActionLog( state );
+			const log2 = getActionLog( state );
+
+			expect( log1 ).to.equal( log2 );
 		} );
 	} );
 } );
