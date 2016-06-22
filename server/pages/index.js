@@ -7,6 +7,7 @@ var express = require( 'express' ),
 	debug = require( 'debug' )( 'calypso:pages' );
 
 var config = require( 'config' ),
+	abtest = require( 'lib/abtest' ).abtest,
 	sanitize = require( 'sanitize' ),
 	utils = require( 'bundler/utils' ),
 	sectionsModule = require( '../../client/sections' ),
@@ -121,7 +122,7 @@ function getDefaultContext( request ) {
 		abTestHelper: !! config.isEnabled( 'dev/test-helper' ),
 		devDocsURL: '/devdocs',
 		catchJsErrors: '/calypso/catch-js-errors-' + 'v2' + '.min.js',
-		isPushEnabled: !! config.isEnabled( 'push-notifications' )
+		isPushEnabled: !! ( ( config.isEnabled( 'push-notifications' ) || ( config.isEnabled( 'push-notifications-ab-test' ) && abtest( 'browserNotifications' ) === 'enabled' ) ) ),
 	} );
 
 	context.app = {
