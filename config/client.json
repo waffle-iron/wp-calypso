@@ -27,6 +27,5 @@
   "facebook_api_key",
   "discover_blog_id",
   "support-user",
-  "sync-handler-defaults",
-  "email_verification_gate"
+  "sync-handler-defaults"
 ]
