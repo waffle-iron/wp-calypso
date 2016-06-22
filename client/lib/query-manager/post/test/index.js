@@ -103,6 +103,14 @@ describe( 'PostQueryManager', () => {
 
 				expect( isMatch ).to.be.true;
 			} );
+
+			it( 'should separately test title and content fields', () => {
+				const isMatch = manager.matches( {
+					search: 'ChickenAre'
+				}, DEFAULT_POST );
+
+				expect( isMatch ).to.be.false;
+			} );
 		} );
 
 		context( 'query.after', () => {
@@ -683,55 +691,6 @@ describe( 'PostQueryManager', () => {
 					] );
 				} );
 			} );
-		} );
-	} );
-
-	describe( '#mergeItem()', () => {
-		it( 'should set a post as trashed', () => {
-			manager = manager.receive( {
-				ID: 144,
-				type: 'post'
-			} );
-
-			manager = manager.receive( {
-				ID: 144,
-				status: 'trash'
-			}, { patch: true } );
-
-			expect( manager.getItems() ).to.eql( [ {
-				ID: 144,
-				type: 'post',
-				status: 'trash'
-			} ] );
-		} );
-
-		it( 'should omit a trashed post on trash', () => {
-			manager = manager.receive( {
-				ID: 144,
-				type: 'post',
-				status: 'trash'
-			} );
-
-			manager = manager.receive( {
-				ID: 144,
-				status: 'trash'
-			}, { patch: true } );
-
-			expect( manager.getItems() ).to.eql( [] );
-		} );
-
-		it( 'should omit a CPT on trash', () => {
-			manager = manager.receive( {
-				ID: 144,
-				type: 'jetpack-testimonial'
-			} );
-
-			manager = manager.receive( {
-				ID: 144,
-				status: 'trash'
-			}, { patch: true } );
-
-			expect( manager.getItems() ).to.eql( [] );
 		} );
 	} );
 } );

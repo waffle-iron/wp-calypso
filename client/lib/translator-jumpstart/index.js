@@ -20,7 +20,7 @@ var config = require( 'config' ),
  * Local variables
  */
 var communityTranslatorBaseUrl = 'https://widgets.wp.com/community-translator/',
-	communityTranslatorVersion = '1',
+	communityTranslatorVersion = '1.160620',
 	translationDataFromPage = {
 		localeCode: 'en',
 		languageName: 'English',
@@ -87,7 +87,7 @@ communityTranslatorJumpstart = {
 		props = { className: 'translatable' };
 
 		if ( 'string' === typeof originalFromPage ) {
-			props.value = originalFromPage;
+			props[ 'data-singular' ] = originalFromPage;
 		} else {
 			debug( 'unknown original format' );
 			return displayedTranslationFromPage;

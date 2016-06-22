@@ -16,6 +16,18 @@ import get from 'lodash/get';
 import QueryKey from './key';
 
 /**
+ * Constants
+ */
+
+/**
+ * Object key name for property used in indicating that an item is intended to
+ * be removed during patched `mergeItem`.
+ *
+ * @type {String}
+ */
+export const DELETE_PATCH_KEY = '__DELETE';
+
+/**
  * QueryManager manages items which can be queried and change over time. It is
  * intended to be extended by a more specific implementation which is
  * responsible for implementing its matching, merging, and sorting behaviors.
@@ -79,6 +91,10 @@ export default class QueryManager {
 	 */
 	mergeItem( item, revisedItem, patch = false ) {
 		if ( patch ) {
+			if ( revisedItem[ DELETE_PATCH_KEY ] ) {
+				return undefined;
+			}
+
 			return Object.assign( {}, item, revisedItem );
 		}
 
@@ -126,10 +142,11 @@ export default class QueryManager {
 
 	/**
 	 * Returns items tracked by the instance. If a query is specified, returns
-	 * items specific to that query.
+	 * items specific to that query, or null if no items have been received for
+	 * the query.
 	 *
-	 * @param  {?Object} query Optional query object
-	 * @return {Object[]}      Items tracked
+	 * @param  {?Object}       query Optional query object
+	 * @return {Object[]|null}       Items tracked, if known
 	 */
 	getItems( query ) {
 		if ( ! query ) {
@@ -156,6 +173,37 @@ export default class QueryManager {
 	getFound( query ) {
 		const queryKey = this.constructor.QueryKey.stringify( query );
 		return get( this.data.queries, [ queryKey, 'found' ], null );
+	}
+
+	/**
+	 * Removes a single item given its item key, returning a new instance of
+	 * QueryManager if the tracked items have changed, or the current instance
+	 * otherwise.
+	 *
+	 * @param  {String}       itemKey Key of item to remove
+	 * @return {QueryManager}         New instance if changed, or same instance
+	 *                                otherwise
+	 */
+	removeItem( itemKey ) {
+		return this.removeItems( [ itemKey ] );
+	}
+
+	/**
+	 * Removes multiple items given an array of item keys, returning a new
+	 * instance of QueryManager if the tracked items have changed, or the
+	 * current instance otherwise.
+	 *
+	 * @param  {String[]}     itemKeys Keys of items to remove
+	 * @return {QueryManager}          New instance if changed, or same
+	 *                                 instance otherwise
+	 */
+	removeItems( itemKeys = [] ) {
+		return this.receive( itemKeys.map( ( itemKey ) => {
+			return {
+				[ this.options.itemKey ]: itemKey,
+				[ DELETE_PATCH_KEY ]: true
+			};
+		} ), { patch: true } );
 	}
 
 	/**
@@ -186,8 +234,14 @@ export default class QueryManager {
 			const mergedItem = this.mergeItem( item, receivedItem, options.patch );
 
 			if ( undefined === mergedItem ) {
-				// `undefined` item is an intended omission from set
-				return omit( memo, receivedItemKey );
+				if ( item ) {
+					// `undefined` item is an intended omission from set
+					return omit( memo, receivedItemKey );
+				}
+
+				// Item never existed in set in the first place, skip and
+				// return same memo
+				return memo;
 			}
 
 			if ( ! item || ! isEqual( mergedItem, item ) ) {

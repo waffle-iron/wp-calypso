@@ -971,7 +971,7 @@ Undocumented.prototype.readFeedPost = function( query, fn ) {
 	debug( '/read/feed/' + query.feedId + '/posts/' + query.postId );
 	params.apiVersion = '1.3';
 
-	this.wpcom.req.get( '/read/feed/' + encodeURIComponent( query.feedId ) + '/posts/' + encodeURIComponent( query.postId ), params, fn );
+	return this.wpcom.req.get( '/read/feed/' + encodeURIComponent( query.feedId ) + '/posts/' + encodeURIComponent( query.postId ), params, fn );
 };
 
 Undocumented.prototype.readSearch = function( query, fn ) {
@@ -1113,28 +1113,25 @@ Undocumented.prototype.readTeams = function( fn ) {
 Undocumented.prototype.readSite = function( query, fn ) {
 	var params = omit( query, 'site' );
 	debug( '/read/sites/:site' );
-	query.apiVersion = '1.1';
 	return this.wpcom.req.get( '/read/sites/' + query.site, params, fn );
 };
 
 Undocumented.prototype.readSiteFeatured = function( siteId, query, fn ) {
 	var params = omit( query, [ 'before', 'after' ] );
 	debug( '/read/sites/:site/featured' );
-	this.wpcom.req.get( '/read/sites/' + siteId + '/featured', params, fn );
+	return this.wpcom.req.get( '/read/sites/' + siteId + '/featured', params, fn );
 };
 
 Undocumented.prototype.readSitePosts = function( query, fn ) {
 	var params = omit( query, 'site' );
 	debug( '/read/sites/:site/posts' );
-	query.apiVersion = '1.1';
-	this.wpcom.req.get( '/read/sites/' + query.site + '/posts', params, fn );
+	return this.wpcom.req.get( '/read/sites/' + query.site + '/posts', params, fn );
 };
 
 Undocumented.prototype.readSitePost = function( query, fn ) {
 	var params = omit( query, [ 'site', 'postId' ] );
 	debug( '/read/sites/:site/post/:post' );
-	query.apiVersion = '1.1';
-	this.wpcom.req.get( '/read/sites/' + query.site + '/posts/' + query.postId, params, fn );
+	return this.wpcom.req.get( '/read/sites/' + query.site + '/posts/' + query.postId, params, fn );
 };
 
 Undocumented.prototype.readSitePostRelated = function( query, fn ) {
@@ -1768,7 +1765,7 @@ Undocumented.prototype.submitSupportForumsTopic = function( subject, message, cl
  * @api public
  */
 Undocumented.prototype.getExportSettings = function( siteId, fn ) {
-	return this.wpcom.req.get( {
+	return this.wpcom.withLocale().req.get( {
 		apiVersion: '1.1',
 		path: `/sites/${ siteId }/exports/settings`
 	}, fn );
@@ -1783,7 +1780,7 @@ Undocumented.prototype.getExportSettings = function( siteId, fn ) {
  * @returns {Promise}                   A promise that resolves when the export started
  */
 Undocumented.prototype.startExport = function( siteId, advancedSettings, fn ) {
-	return this.wpcom.req.post( {
+	return this.wpcom.withLocale().req.post( {
 		apiVersion: '1.1',
 		path: `/sites/${ siteId }/exports/start`
 	}, advancedSettings, fn );
@@ -1798,7 +1795,7 @@ Undocumented.prototype.startExport = function( siteId, advancedSettings, fn ) {
  * @returns {Promise}  promise
  */
 Undocumented.prototype.getExport = function( siteId, exportId, fn ) {
-	return this.wpcom.req.get( {
+	return this.wpcom.withLocale().req.get( {
 		apiVersion: '1.1',
 		path: `/sites/${ siteId }/exports/${ exportId }`
 	}, fn );

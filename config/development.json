@@ -94,6 +94,7 @@
 		"preview-endpoint": false,
 		"network-connection": true,
 		"notifications2beta": true,
+		"oauth": false,
 		"olark": true,
 		"perfmon": false,
 		"persist-redux": true,
@@ -117,7 +118,6 @@
 		"server-side-rendering": true,
 		"settings/security/monitor": true,
 		"settings/security/scan": true,
-		"sidebar-drafts-count": true,
 		"support-user": true,
 		"sync-handler": true,
 		"upgrades/checkout": true,
@@ -132,5 +132,6 @@
 		"vip/deploys": true,
 		"vip/logs": true,
 		"vip/support": true
-	}
+	},
+	"email_verification_gate": true
 }

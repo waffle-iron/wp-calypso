@@ -298,10 +298,7 @@ function reduxStoreReady( reduxStore ) {
 		next();
 	} );
 
-	page( '*', function( context, next ) {
-		emailVerification.renderNotice( context );
-		next();
-	} );
+	page( '*', emailVerification );
 
 	if ( config.isEnabled( 'oauth' ) ) {
 		// Forces OAuth users to the /login page if no token is present
@@ -328,7 +325,11 @@ function reduxStoreReady( reduxStore ) {
 			} );
 
 			if ( '/' === context.pathname && config.isEnabled( 'devdocs/redirect-loggedout-homepage' ) ) {
-				page.redirect( '/devdocs/start' );
+				if ( config.isEnabled( 'oauth' ) ) {
+					page.redirect( '/authorize' );
+				} else {
+					page.redirect( '/devdocs/start' );
+				}
 				return;
 			}
 
