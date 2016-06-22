@@ -74,8 +74,8 @@ export function canCurrentUser( state, siteId, capability ) {
  */
 export const getActionLog = createSelector(
 	state => [
-		...get( state, 'currentUser.actionLog.permanent', [] ),
-		...get( state, 'currentUser.actionLog.temporary', [] ),
+		...state.currentUser.actionLog.permanent,
+		...state.currentUser.actionLog.temporary,
 	],
 	state => [
 		state.currentUser.actionLog.permanent,
