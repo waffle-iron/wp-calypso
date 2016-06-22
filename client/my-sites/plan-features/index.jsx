@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import classNames from 'classnames';
 import noop from 'lodash/noop';
 import get from 'lodash/get';
+import page from 'page';
 
 /**
  * Internal dependencies
@@ -16,9 +17,10 @@ import PlanFeaturesItem from './item';
 import PlanFeaturesFooter from './footer';
 import { isCurrentSitePlan } from 'state/sites/selectors';
 import { getSelectedSiteId } from 'state/ui/selectors';
+import { getSiteSlug } from 'state/sites/selectors';
 import { getPlanRawPrice, getPlan } from 'state/plans/selectors';
 import { plansList, getPlanFeaturesObject, PLAN_FREE, PLAN_PREMIUM, PLAN_BUSINESS } from 'lib/plans/constants';
-
+import { addItem as addItemToCart } from 'lib/upgrades/actions/cart';
 class PlanFeatures extends Component {
 	render() {
 		if ( ! this.props.planObject ) {
@@ -90,6 +92,15 @@ export default connect( ( state, ownProps ) => {
 		rawPrice: getPlanRawPrice( state, planProductId /**, get from abtest **/ ),
 		planConstantObj: plansList[ ownProps.plan ],
 		billingTimeFrame: get( planObject, 'bill_period_label', '' ),
+		onUpgradeClick: ownProps.plan === PLAN_FREE ? noop : () => {
+			const selectedSiteSlug = getSiteSlug( state, selectedSiteId );
+			addItemToCart( { product_slug: plansList[ ownProps.plan ].getStoreSlug() } );
+			const checkoutPath = ownProps.selectedFeature
+				? `/checkout/features/${ownProps.selectedFeature}/${ selectedSiteSlug }`
+				: `/checkout/${ selectedSiteSlug }`;
+
+			page( checkoutPath );
+		},
 		planObject: planObject
 	};
 } )( PlanFeatures );
