@@ -2,8 +2,8 @@
  * External dependencies
  */
 import { combineReducers } from 'redux';
+import mapValues from 'lodash/mapValues';
 import merge from 'lodash/merge';
-import keyBy from 'lodash/keyBy';
 
 /**
  * Internal dependencies
@@ -16,18 +16,10 @@ import {
 	TERMS_REQUEST_SUCCESS,
 	SERIALIZE
 } from 'state/action-types';
-import { isValidStateWithSchema } from 'state/utils';
-import { DEFAULT_TERMS_QUERY } from './constants';
-
-import {
-	getSerializedTermsQuery,
-	getSerializedTermsQueryWithoutPage
-} from './utils';
-
-import {
-	termsSchema,
-	queriesSchema
-} from './schema';
+import TermQueryManager from 'lib/query-manager/term';
+import { isValidStateWithSchema, createReducer } from 'state/utils';
+import { getSerializedTermsQuery } from './utils';
+import { queriesSchema } from './schema';
 
 /**
  * Returns the updated terms query requesting state after an action has been
@@ -64,100 +56,45 @@ export function queryRequests( state = {}, action ) {
  * Returns the updated term query state after an action has been dispatched.
  * The state reflects a mapping of serialized query key to an array of term IDs
  * for the query, if a query response was successfully received.
- *
- * @param  {Object} state  Current state
- * @param  {Object} action Action payload
- * @return {Object}        Updated state
  */
-export function queries( state = {}, action ) {
-	switch ( action.type ) {
-		case TERMS_RECEIVE:
-			if ( ! action.query ) {
-				return state;
+export const queries = createReducer( {}, {
+	[ TERMS_RECEIVE ]: ( state, action ) => {
+		const { siteId, query, taxonomy, terms, found } = action;
+		const hasManager = state[ siteId ] && state[ siteId ][ taxonomy ];
+		const manager = hasManager ? state[ siteId ][ taxonomy ] : new TermQueryManager();
+		const nextManager = manager.receive( terms, { query, found } );
+
+		if ( hasManager && nextManager === state[ siteId ][ taxonomy ] ) {
+			return state;
+		}
+
+		return merge( {}, state, {
+			[ action.siteId ]: {
+				[ action.taxonomy ]: nextManager
 			}
-
-			const serializedQuery = getSerializedTermsQuery( action.query );
-			return merge( {}, state, {
-				[ action.siteId ]: {
-					[ action.taxonomy ]: {
-						[ serializedQuery ]: action.terms.map( ( term ) => term.ID )
-					}
-				}
+		} );
+	},
+	[ SERIALIZE ]: ( state ) => {
+		return mapValues( state, ( taxonomies ) => {
+			return mapValues( taxonomies, ( manager ) => {
+				return manager.toJSON();
 			} );
-
-		case DESERIALIZE:
-			if ( isValidStateWithSchema( state, queriesSchema ) ) {
-				return state;
-			}
-
+		} );
+	},
+	[ DESERIALIZE ]: ( state ) => {
+		if ( ! isValidStateWithSchema( state, queriesSchema ) ) {
 			return {};
-	}
+		}
 
-	return state;
-}
-
-/**
- * Returns the updated terms query last page state after an action has been
- * dispatched. The state reflects a mapping of serialized query to last known
- * page number.
- *
- * @param  {Object} state  Current state
- * @param  {Object} action Action payload
- * @return {Object}        Updated state
- */
-export function queriesLastPage( state = {}, action ) {
-	switch ( action.type ) {
-		case TERMS_REQUEST_SUCCESS:
-			const { siteId, found, taxonomy, query } = action;
-			const serializedQuery = getSerializedTermsQueryWithoutPage( query );
-			const lastPage = Math.ceil( found / ( query.number || DEFAULT_TERMS_QUERY.number ) );
-
-			return merge( {}, state, {
-				[ siteId ]: {
-					[ taxonomy ]: {
-						[ serializedQuery ]: Math.max( lastPage, 1 )
-					}
-				}
+		return mapValues( state, ( taxonomies ) => {
+			return mapValues( taxonomies, ( manager ) => {
+				return TermQueryManager.parse( manager );
 			} );
-
-		case SERIALIZE:
-		case DESERIALIZE:
-			return {};
+		} );
 	}
-	return state;
-}
-
-/**
- * Returns the updated terms state after an action has been dispatched.
- * The state reflects a mapping of site ID to terms
- *
- * @param  {Object} state  Current state
- * @param  {Object} action Action payload
- * @return {Object}        Updated state
- */
-export function items( state = {}, action ) {
-	switch ( action.type ) {
-		case TERMS_RECEIVE:
-			return merge( {}, state, {
-				[ action.siteId ]: {
-					[ action.taxonomy ]: keyBy( action.terms, 'ID' )
-				}
-			} );
-
-		case DESERIALIZE:
-			if ( isValidStateWithSchema( state, termsSchema ) ) {
-				return state;
-			}
-
-			return {};
-	}
-
-	return state;
-}
+} );
 
 export default combineReducers( {
-	items,
 	queries,
-	queriesLastPage,
 	queryRequests
 } );
