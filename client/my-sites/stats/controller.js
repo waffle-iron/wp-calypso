@@ -19,9 +19,7 @@ var user = require( 'lib/user' )(),
 	titlecase = require( 'to-title-case' ),
 	analyticsPageTitle = 'Stats',
 	layoutFocus = require( 'lib/layout-focus' ),
-	titleActions = require( 'lib/screen-title/actions' ),
-	FirstViewWrapper = require( 'components/first-view' ),
-	FirstView = require( 'components/first-view/first-view' );
+	titleActions = require( 'lib/screen-title/actions' );
 
 function getVisitDates() {
 	var statsVisitDates = store.get( 'statVisits' ) || [];
@@ -185,22 +183,19 @@ module.exports = {
 
 		ReactDom.render(
 			React.createElement( ReactRedux.Provider, { store: context.store },
-				React.createElement( FirstViewWrapper, { initialShowFirstView: true },
-					React.createElement( FirstView ),
-					React.createElement( StatsComponent, {
-						site: site,
-						followList: followList,
-						allTimeList: allTimeList,
-						insightsList: insightsList,
-						commentsList: commentsList,
-						tagsList: tagsList,
-						publicizeList: publicizeList,
-						wpcomFollowersList: wpcomFollowersList,
-						emailFollowersList: emailFollowersList,
-						commentFollowersList: commentFollowersList,
-						summaryDate: summaryDate
-					} )
-				)
+				React.createElement( StatsComponent, {
+					site: site,
+					followList: followList,
+					allTimeList: allTimeList,
+					insightsList: insightsList,
+					commentsList: commentsList,
+					tagsList: tagsList,
+					publicizeList: publicizeList,
+					wpcomFollowersList: wpcomFollowersList,
+					emailFollowersList: emailFollowersList,
+					commentFollowersList: commentFollowersList,
+					summaryDate: summaryDate
+				} )
 			),
 			document.getElementById( 'primary' )
 		);

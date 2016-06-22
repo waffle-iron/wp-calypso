@@ -1,10 +1,9 @@
-.first-view-wrapper {
-	position: relative;
-}
-
 .first-view {
-	position: absolute;
+	position: fixed;
+	top: 0;
+	bottom: 0;
 	width: 100%;
+	z-index: 9999;
 
 	text-align: center;
 
@@ -14,19 +13,23 @@
 	transition: all 0.25s ease-in-out;
 
 	&.active {
-		opacity: 1;
-		pointer-events: auto;
+		opacity: 0.9;
 		transform: scale( 1 );
 	}
 }
 
-.first-view-main-view {
+.first-view__content {
+	height: 100%;
+	pointer-events: auto;
+}
+
+.first-viewable {
 	opacity: 1;
 	pointer-events: auto;
 	transform: scale( 1 );
 	transition: all 0.25s ease-in-out;
 
-	&.inactive {
+	&.first-view-active {
 		opacity: 0.2;
 		pointer-events: none;
 		transform: scale( 0.9 );

@@ -3,6 +3,7 @@
 */
 import React, { PropTypes } from 'react';
 import i18n from 'i18n-calypso';
+import classNames from 'classnames';
 
 /**
  * Internal dependencies
@@ -19,6 +20,8 @@ import statsStrings from '../stats-strings';
 import MostPopular from 'my-sites/stats/most-popular';
 import LatestPostSummary from '../post-performance';
 import DomainTip from 'my-sites/domain-tip';
+import FirstView from 'components/first-view';
+import FirstViewable from 'components/first-view/first-viewable';
 
 export default React.createClass( {
 	displayName: 'StatsInsights',
@@ -37,6 +40,12 @@ export default React.createClass( {
 		] ),
 		summaryDate: PropTypes.string,
 		wpcomFollowersList: PropTypes.object
+	},
+
+	getInitialState: function() {
+		return {
+			firstViewActive: true
+		};
 	},
 
 	render() {
@@ -72,8 +81,16 @@ export default React.createClass( {
 							beforeNavigate={ this.updateScrollPosition } />;
 		}
 
+		const mainViewClasses = classNames( 'first-view-main-view', {
+			inactive: this.state.firstViewActive
+		} );
+
+
 		return (
-			<div>
+			<FirstViewable firstViewActive={ this.state.firstViewActive }>
+				<FirstView active={ this.state.firstViewActive } onDismiss={ this.onFirstViewDismiss }>
+						TODO: First view content goes here!
+				</FirstView>
 				<SidebarNavigation />
 				<StatsNavigation section="insights" site={ site } />
 				<div id="my-stats-content">
@@ -116,7 +133,13 @@ export default React.createClass( {
 						</div>
 					</div>
 				</div>
-			</div>
+			</FirstViewable>
 		);
+	},
+
+	onFirstViewDismiss() {
+		this.setState( {
+			firstViewActive: false
+		} );
 	}
 } );

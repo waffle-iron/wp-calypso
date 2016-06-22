@@ -2,26 +2,22 @@
  * External dependencies
  */
 import React from 'react';
+import classNames from 'classnames';
 
 /**
  * Internal dependencies
  */
-import Button from 'components/button';
 
 export default React.createClass( {
 	render: function() {
-		return (
-			<div>
-				{ this.props.children }
+		const classes = classNames( 'first-viewable', {
+			'first-view-active': this.props.firstViewActive
+		} );
 
-				<Button onClick={ this.onClick }>Got it!</Button>
+		return (
+			<div className={ classes }>
+				{ this.props.children }
 			</div>
 		);
-	},
-
-	onClick: function() {
-		if ( this.props.onDismiss ) {
-			this.props.onDismiss();
-		}
 	}
 } );
